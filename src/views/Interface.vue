@@ -9,7 +9,7 @@
     </form>
 
     <div>
-      <record-list @remove="remove" @load="load" :records="records"/>
+      <record-list @reorder="reorder" @remove="remove" @load="load" :records="records"/>
     </div>
   </div>
 </template>
@@ -36,7 +36,7 @@
         this.addRecord(data)
       },
       addRecord(data) {
-        this.records.push(data)
+        this.records = [ ...this.records, data ]
         this.save()
       },
       load(record) {
@@ -47,6 +47,10 @@
       },
       remove(id) {
         this.records = this.records.filter(record => record.id !== id)
+        this.save()
+      },
+      reorder(records) {
+        this.records = records
         this.save()
       },
       save() {

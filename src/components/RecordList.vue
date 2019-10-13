@@ -1,6 +1,7 @@
 <template>
   <div class="recordlist">
-    <div class="loader" v-for="record in records">
+    <draggable v-model="recordList" @end="$emit('reorder', recordList)">
+    <div class="loader" :key="record.id" v-for="record in recordList">
       <div class="load-button" @click="loadLeft(record)"> <i class="fas fa-caret-square-left"></i> </div>
       <div class="record">
       <div class="image"><img :src="record.thumb"></div>
@@ -13,11 +14,22 @@
     </div>
       <div class="load-button" @click="loadRight(record)"> <i class="fas fa-caret-square-right"></i> </div>
     </div>
+    </draggable>
   </div>
 </template>
 <script>
+  import draggable from 'vuedraggable'
+
   export default {
     name: 'record-list',
+    components: {
+      draggable
+    },
+    data() {
+      return {
+        recordList: []
+      }
+    },
     props: {
       records: {}
     },
@@ -31,6 +43,15 @@
       remove(id) {
         this.$emit('remove', id)
       }
+    },
+    watch: {
+      records(newValue) {
+        console.log("records update")
+        this.recordList = [...newValue]
+      }
+    },
+    created() {
+      this.recordList = [...this.records]
     }
   }
 </script>
