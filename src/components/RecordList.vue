@@ -13,7 +13,7 @@
       <div class="text">
         <h2>{{ record.artists_sort }} - {{ record.title }}</h2>
         <br>
-        <button @click="remove(record.id)">Remove</button>
+        <button @click="remove(idx)">Remove</button>
       </div>
 
     </div>
@@ -72,8 +72,7 @@
           this.loadedRight = null
         }
         socket.emit('unload', deck)
-      },
-
+      }
     },
     watch: {
       records(newValue) {
@@ -84,26 +83,24 @@
     created() {
       this.recordList = [...this.records]
       window.onkeydown = (ev) => {
-        console.log(ev)
-        ev.preventDefault()
-        if(ev.key.toLowerCase() === 'w' || ev.key === "ArrowUp") {
+        if(ev.key.toLowerCase() === 'w') {
           this.selectedColumn = Math.max(this.selectedColumn - 1, 0)
           const el = document.getElementById('loader'+this.selectedColumn)
           if(!isInViewport(el)) {
             el.scrollIntoView()
           }
         }
-        if(ev.key.toLowerCase() === 's' || ev.key === "ArrowDown") {
+        if(ev.key.toLowerCase() === 's') {
           this.selectedColumn = Math.min(this.selectedColumn + 1, this.recordList.length - 1)
           const el = document.getElementById('loader'+this.selectedColumn)
           if(!isInViewport(el)) {
             el.scrollIntoView()
           }
         }
-        if(ev.key.toLowerCase() === 'a' || ev.key === "ArrowLeft") {
+        if(ev.key.toLowerCase() === 'a') {
           this.loadLeft(this.recordList[this.selectedColumn])
         }
-        if(ev.key.toLowerCase() === 'd' || ev.key === "ArrowRight") {
+        if(ev.key.toLowerCase() === 'd') {
           this.loadRight(this.recordList[this.selectedColumn])
         }
         if(ev.key.toLowerCase() === 'q') {

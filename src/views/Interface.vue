@@ -25,9 +25,19 @@
     },
     name: "Interface",
     methods: {
+      recordExists(recordId) {
+        return !!this.records.find(record => record.id === recordId)
+      },
       async searchDiscogs() {
         console.log(this.query)
-        const { data } = await axios.post('/api/search', { q: this.query.match(/([0-9]+)$/)[0] })
+
+        let recordId = this.query.match(/([0-9]+)$/)[0]
+        if(this.recordExists(recordId)){
+          this.query = ""
+          return
+        }
+
+        const { data } = await axios.post('/api/search', { q: recordId })
         this.query = ""
         this.addRecord(data)
       },
@@ -36,7 +46,7 @@
         this.save()
       },
       remove(id) {
-        this.records = this.records.filter(record => record.id !== id)
+        this.records = this.records.filter((record, idx)=> idx !== id)
         this.save()
       },
       reorder(records) {
