@@ -1,15 +1,12 @@
 <template>
   <div class="inteface">
-    <div class="buttons">
-      <button @click="unload(0)">UNLOAD A</button>
-      <button @click="unload(1)">UNLOAD B</button>
-    </div>
+
     <form @submit.prevent="searchDiscogs">
       <input type="text" class="search" v-model="query">
     </form>
 
     <div>
-      <record-list @reorder="reorder" @remove="remove" @load="load" :records="records"/>
+      <record-list @reorder="reorder" @remove="remove" :records="records"/>
     </div>
   </div>
 </template>
@@ -17,7 +14,6 @@
 <script>
   import axios from 'axios'
   import RecordList from "../components/RecordList"
-  const socket = io();
 
   export default {
     components: {RecordList},
@@ -38,12 +34,6 @@
       addRecord(data) {
         this.records = [ ...this.records, data ]
         this.save()
-      },
-      load(record) {
-        socket.emit('load', record)
-      },
-      unload(deck) {
-        socket.emit('unload', deck)
       },
       remove(id) {
         this.records = this.records.filter(record => record.id !== id)

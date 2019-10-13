@@ -1,9 +1,14 @@
 <template>
   <div class="recordlist">
+    <div class="buttons">
+      <button @click="unload(0)">UNLOAD A</button>
+      <button @click="unload(1)">UNLOAD B</button>
+    </div>
+
     <draggable v-model="recordList" @end="$emit('reorder', recordList)">
-    <div class="loader" :key="record.id" v-for="record in recordList">
-      <div class="load-button" @click="loadLeft(record)"> <i class="fas fa-caret-square-left"></i> </div>
-      <div class="record">
+    <div :id="'loader'+idx" class="loader" :key="record.id" v-for="(record, idx) in recordList">
+      <div class="load-button" :class="{loaded: loadedLeft === record}" @click="loadLeft(record)"> <i class="fas fa-caret-square-left"></i> </div>
+      <div class="record" :class="{selected: selectedColumn === idx}">
       <div class="image"><img :src="record.thumb"></div>
       <div class="text">
         <h2>{{ record.artists_sort }} - {{ record.title }}</h2>
@@ -12,14 +17,23 @@
       </div>
 
     </div>
-      <div class="load-button" @click="loadRight(record)"> <i class="fas fa-caret-square-right"></i> </div>
+      <div class="load-button" :class="{loaded: loadedRight === record}" @click="loadRight(record)"> <i class="fas fa-caret-square-right"></i> </div>
     </div>
     </draggable>
   </div>
 </template>
 <script>
   import draggable from 'vuedraggable'
-
+  const socket = io()
+  const isInViewport = function (elem) {
+    const bounding = elem.getBoundingClientRect();
+    return (
+      bounding.top >= 0 &&
+      bounding.left >= 0 &&
+      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  };
   export default {
     name: 'record-list',
     components: {
@@ -27,6 +41,9 @@
     },
     data() {
       return {
+        loadedLeft: null,
+        loadedRight: null,
+        selectedColumn: 0,
         recordList: []
       }
     },
@@ -35,14 +52,28 @@
     },
     methods: {
       loadLeft(record) {
-        this.$emit('load', { channel: 0, record })
+        this.loadedLeft = record
+        this.load({ channel: 0, record })
       },
       loadRight (record) {
-        this.$emit('load', { channel: 1, record })
+        this.loadedRight = record
+        this.load({ channel: 1, record })
       },
       remove(id) {
         this.$emit('remove', id)
-      }
+      },
+      load(record) {
+        socket.emit('load', record)
+      },
+      unload(deck) {
+        if(deck === 0) {
+          this.loadedLeft = null
+        } else {
+          this.loadedRight = null
+        }
+        socket.emit('unload', deck)
+      },
+
     },
     watch: {
       records(newValue) {
@@ -52,6 +83,35 @@
     },
     created() {
       this.recordList = [...this.records]
+      window.onkeydown = (ev) => {
+        console.log(ev)
+        if(ev.key.toLowerCase() === 'w' || ev.key === "ArrowUp") {
+          this.selectedColumn = Math.max(this.selectedColumn - 1, 0)
+          const el = document.getElementById('loader'+this.selectedColumn)
+          if(!isInViewport(el)) {
+            el.scrollIntoView()
+          }
+        }
+        if(ev.key.toLowerCase() === 's' || ev.key === "ArrowDown") {
+          this.selectedColumn = Math.min(this.selectedColumn + 1, this.recordList.length - 1)
+          const el = document.getElementById('loader'+this.selectedColumn)
+          if(!isInViewport(el)) {
+            el.scrollIntoView()
+          }
+        }
+        if(ev.key.toLowerCase() === 'a' || ev.key === "ArrowLeft") {
+          this.loadLeft(this.recordList[this.selectedColumn])
+        }
+        if(ev.key.toLowerCase() === 'd' || ev.key === "ArrowRight") {
+          this.loadRight(this.recordList[this.selectedColumn])
+        }
+        if(ev.key.toLowerCase() === 'q') {
+          this.unload(0)
+        }
+        if(ev.key.toLowerCase() === 'e') {
+          this.unload(1)
+        }
+      }
     }
   }
 </script>
@@ -73,6 +133,9 @@
       justify-content: center;
       flex-direction: column;
       text-align: center;
+      &.loaded {
+        color: green
+      }
     }
   }
   .record {
@@ -80,6 +143,9 @@
     width: 100%;
     display: flex;
     background: #b9b9b9;
+    &.selected {
+      background: #86b986;
+    }
     .image {
       padding: 0;
       margin: 0;

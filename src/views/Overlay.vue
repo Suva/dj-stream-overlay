@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="overlay">
     <transition name="offscreen"><div v-if="leftVisible" class="record-display left">
       <recordbanner :record="leftRecord"></recordbanner>
     </div></transition>
@@ -55,6 +55,15 @@
 </script>
 
 <style lang="scss" scoped>
+.overlay {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .offscreen-enter-active, .offscreen-leave-active,
 .offscreen-right-enter-active, .offscreen-right-leave-active {
   transition: all 0.3s ease;
