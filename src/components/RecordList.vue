@@ -85,6 +85,7 @@
       this.recordList = [...this.records]
       window.onkeydown = (ev) => {
         console.log(ev)
+        ev.preventDefault()
         if(ev.key.toLowerCase() === 'w' || ev.key === "ArrowUp") {
           this.selectedColumn = Math.max(this.selectedColumn - 1, 0)
           const el = document.getElementById('loader'+this.selectedColumn)
@@ -127,7 +128,7 @@
     .load-button {
       width: 120px;
       height: 120px;
-      font-size: 700%;
+      font-size: 138px;
       margin: 0 5px;
       display: flex;
       justify-content: center;
@@ -143,6 +144,7 @@
     width: 100%;
     display: flex;
     background: #b9b9b9;
+    border-radius: 10px;
     &.selected {
       background: #86b986;
     }
