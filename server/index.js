@@ -25,9 +25,19 @@ const dis = new Discogs({userToken: process.env.DISCOGS_USER_TOKEN});
 const db = dis.database()
 
 app.post("/api/search", async (req, res) => {
-  console.log(req.body)
   const release = await db.getRelease(req.body.q)
   res.json(release)
+})
+
+app.post("/api/new-track", async (req, res) => {
+  io.emit('rekordbox-load', req.body);
+  res.json({ status: "OK" })
+})
+
+app.post("/api/add-image", async (req, res) => {
+  console.log(req.body)
+  io.emit('rekordbox-image', req.body);
+  res.json({ status: "OK" })
 })
 
 app.use(express.static('dist'))

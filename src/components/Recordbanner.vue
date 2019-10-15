@@ -1,49 +1,56 @@
 <template>
-    <div>
-      <div class="record" :class="{ right }">
-        <img :src="record.thumb">
+    <div :class="{ right, bottom }">
+      <div class="record" :class="{ right, bottom }">
+        <img v-if="thumbnail" :src="thumbnail">
         <div class="text">
-          <h2>{{ cleanName(record.artists.map(artist => artist.anv || artist.name + (artist.join === "&" ? " " + artist.join : artist.join)).join(" ")) }} - {{ record.title }}</h2>
+          <h2>{{ artist }} - {{ title }}</h2>
           <div class="additional-info">
-            {{ record.labels.map(label => cleanName(label.name)).join(", ") }} {{ record.year }} {{ record.country }}
+            {{ label }} {{ year }} {{ country }}
           </div>
         </div>
       </div>
       <transition name="fade">
-        <div v-if="coming" class="coming-up">
+        <div v-if="coming" class="coming-up" :class="{ right, bottom }">
           Coming up!
         </div>
       </transition>
       <transition name="fade-record">
-        <div v-if="coming" class="record-cover" :class="{ right }">
-          <img :src="record.images[0].uri">
+        <div v-if="coming && image" class="record-cover" :class="{ right, bottom }">
+          <img :src="image">
         </div>
       </transition>
     </div>
 </template>
 
 <script>
-  export default {
-    name: "Recordbanner",
-    props: ["record", "right"],
-    data() {
-      return {
-        coming: false,
-      }
-    },
-    watch: {
-    },
-    mounted(){
-      this.coming = true
-      setTimeout(() => this.coming = false, 10000)
-      console.log("mounted")
-    },
-    methods: {
-      cleanName(name) {
-        return name.replace(/ \([0-9]+\)/, "")
-      }
+export default {
+  name: "Recordbanner",
+  props: [
+    "artist",
+    "title",
+    "label",
+    "year",
+    "country",
+    "thumbnail",
+    "image",
+    "right",
+    "bottom"
+  ],
+  data() {
+    return {
+      coming: false,
     }
+  },
+  watch: {
+  },
+  mounted(){
+    this.coming = true
+    setTimeout(() => { this.coming = false }, 10000)
+  },
+  methods: {
+
   }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -58,16 +65,24 @@
   border-radius: 0 0 20px 0;
   position: relative;
   z-index: 3;
+  &.bottom {
+    border-radius: 0 20px 0 0;
+  }
   &.right {
     border-radius: 0 0 0 20px;
+    &.bottom {
+      border-radius: 20px 0 0 0;
+    }
     flex-direction: row-reverse;
     .text {
       text-align: right !important;
     }
   }
+
   img {
     height: 100%;
   }
+
   .text {
     padding: 0 20px 0;
     font-size: 100%;
@@ -94,6 +109,11 @@
   margin-top: 5px;
   color: white;
   text-shadow: 0px 0px 5px black;
+  &.bottom {
+    position: absolute;
+    bottom: 105px;
+    width: 48vw;
+  }
 }
 
 .record-cover {
@@ -110,8 +130,13 @@
     max-width: 50vw;
     box-shadow: 0 0 10px black;
   }
-}
 
+  &.bottom {
+    position: absolute;
+    bottom: 140px;
+    width: 48vw;
+  }
+}
 
 .fade-enter-active{
   transition: all 1s;
@@ -125,10 +150,16 @@
   transition: all 1s ease;
   opacity: 1;
   transform: translateY(-50px);
+  &.bottom {
+    transform: translateY(50px);
+  }
 }
 
 .fade-enter {
   transform: translateY(-50px);
+  &.bottom {
+    transform: translateY(50px);
+  }
 }
 
 .fade-leave-to {
@@ -150,6 +181,9 @@
 
 .fade-record-enter {
   transform: translateY(-800px);
+  &.bottom {
+    transform: translateY(800px);
+  }
 }
 
 .fade-record-leave-to {

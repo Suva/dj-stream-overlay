@@ -23,95 +23,95 @@
   </div>
 </template>
 <script>
-  import draggable from 'vuedraggable'
-  const socket = io()
-  const isInViewport = function (elem) {
-    const bounding = elem.getBoundingClientRect();
-    return (
-      bounding.top >= 0 &&
-      bounding.left >= 0 &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-  };
-  export default {
-    name: 'record-list',
-    components: {
-      draggable
+import draggable from 'vuedraggable'
+const socket = io()
+const isInViewport = function (elem) {
+  const bounding = elem.getBoundingClientRect();
+  return (
+    bounding.top >= 0 &&
+    bounding.left >= 0 &&
+    bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+};
+export default {
+  name: 'record-list',
+  components: {
+    draggable
+  },
+  data() {
+    return {
+      loadedLeft: null,
+      loadedRight: null,
+      selectedColumn: 0,
+      recordList: []
+    }
+  },
+  props: {
+    records: {}
+  },
+  methods: {
+    loadLeft(record) {
+      this.loadedLeft = record
+      this.load({ channel: 0, record })
     },
-    data() {
-      return {
-        loadedLeft: null,
-        loadedRight: null,
-        selectedColumn: 0,
-        recordList: []
+    loadRight (record) {
+      this.loadedRight = record
+      this.load({ channel: 1, record })
+    },
+    remove(id) {
+      this.$emit('remove', id)
+    },
+    load(record) {
+      socket.emit('load', record)
+    },
+    unload(deck) {
+      if(deck === 0) {
+        this.loadedLeft = null
+      } else {
+        this.loadedRight = null
       }
-    },
-    props: {
-      records: {}
-    },
-    methods: {
-      loadLeft(record) {
-        this.loadedLeft = record
-        this.load({ channel: 0, record })
-      },
-      loadRight (record) {
-        this.loadedRight = record
-        this.load({ channel: 1, record })
-      },
-      remove(id) {
-        this.$emit('remove', id)
-      },
-      load(record) {
-        socket.emit('load', record)
-      },
-      unload(deck) {
-        if(deck === 0) {
-          this.loadedLeft = null
-        } else {
-          this.loadedRight = null
+      socket.emit('unload', deck)
+    }
+  },
+  watch: {
+    records(newValue) {
+      console.log("records update")
+      this.recordList = [...newValue]
+    }
+  },
+  created() {
+    this.recordList = [...this.records]
+    window.onkeydown = (ev) => {
+      if(ev.key.toLowerCase() === 'w') {
+        this.selectedColumn = Math.max(this.selectedColumn - 1, 0)
+        const el = document.getElementById('loader'+this.selectedColumn)
+        if(!isInViewport(el)) {
+          el.scrollIntoView()
         }
-        socket.emit('unload', deck)
       }
-    },
-    watch: {
-      records(newValue) {
-        console.log("records update")
-        this.recordList = [...newValue]
+      if(ev.key.toLowerCase() === 's') {
+        this.selectedColumn = Math.min(this.selectedColumn + 1, this.recordList.length - 1)
+        const el = document.getElementById('loader'+this.selectedColumn)
+        if(!isInViewport(el)) {
+          el.scrollIntoView()
+        }
       }
-    },
-    created() {
-      this.recordList = [...this.records]
-      window.onkeydown = (ev) => {
-        if(ev.key.toLowerCase() === 'w') {
-          this.selectedColumn = Math.max(this.selectedColumn - 1, 0)
-          const el = document.getElementById('loader'+this.selectedColumn)
-          if(!isInViewport(el)) {
-            el.scrollIntoView()
-          }
-        }
-        if(ev.key.toLowerCase() === 's') {
-          this.selectedColumn = Math.min(this.selectedColumn + 1, this.recordList.length - 1)
-          const el = document.getElementById('loader'+this.selectedColumn)
-          if(!isInViewport(el)) {
-            el.scrollIntoView()
-          }
-        }
-        if(ev.key.toLowerCase() === 'a') {
-          this.loadLeft(this.recordList[this.selectedColumn])
-        }
-        if(ev.key.toLowerCase() === 'd') {
-          this.loadRight(this.recordList[this.selectedColumn])
-        }
-        if(ev.key.toLowerCase() === 'q') {
-          this.unload(0)
-        }
-        if(ev.key.toLowerCase() === 'e') {
-          this.unload(1)
-        }
+      if(ev.key.toLowerCase() === 'a') {
+        this.loadLeft(this.recordList[this.selectedColumn])
+      }
+      if(ev.key.toLowerCase() === 'd') {
+        this.loadRight(this.recordList[this.selectedColumn])
+      }
+      if(ev.key.toLowerCase() === 'q') {
+        this.unload(0)
+      }
+      if(ev.key.toLowerCase() === 'e') {
+        this.unload(1)
       }
     }
   }
+}
 </script>
 
 <style lang="scss" scoped>
