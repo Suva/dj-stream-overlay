@@ -35,7 +35,7 @@
     },
     mounted(){
       this.coming = true
-      setTimeout(() => this.coming = false, 5000)
+      setTimeout(() => this.coming = false, 10000)
       console.log("mounted")
     },
     methods: {
