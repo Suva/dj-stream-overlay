@@ -39,14 +39,12 @@
           setTimeout(() => {
             this.leftRecord = record
             this.leftVisible = true
-            this.leftComing = true
           }, 300)
         } else {
           this.rightVisible = false
           setTimeout(() => {
             this.rightRecord = record
             this.rightVisible = true
-            this.rightComing = true
           }, 300)
         }
       })
