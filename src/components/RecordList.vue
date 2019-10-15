@@ -116,7 +116,7 @@
 
 <style lang="scss" scoped>
   .recordlist {
-    width: 1200px;
+    max-width: 1200px;
     margin: 20px auto 0;
   }
   .loader {
