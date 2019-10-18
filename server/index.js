@@ -13,7 +13,11 @@ io.on('connection', function(socket){
     io.emit('load', msg);
   });
   socket.on('unload', function(msg){
+    console.log('unload', msg)
     io.emit('unload', msg);
+  });
+  socket.on('title', function(msg){
+    io.emit('title', msg);
   });
 });
 
@@ -35,7 +39,6 @@ app.post("/api/new-track", async (req, res) => {
 })
 
 app.post("/api/add-image", async (req, res) => {
-  console.log(req.body)
   io.emit('rekordbox-image', req.body);
   res.json({ status: "OK" })
 })

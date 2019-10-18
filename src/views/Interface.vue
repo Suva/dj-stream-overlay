@@ -1,5 +1,6 @@
 <template>
   <div class="inteface">
+    <rekordbox-buttons></rekordbox-buttons>
 
     <form @submit.prevent="searchDiscogs">
       <input type="text" class="search" v-model="query">
@@ -8,15 +9,21 @@
     <div>
       <record-list @reorder="reorder" @remove="remove" :records="records"/>
     </div>
+
+    <div>
+      <title-editor></title-editor>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import RecordList from "../components/RecordList"
+import TitleEditor from "../components/TitleEditor"
+import RekordboxButtons from "../components/RekordboxButtons"
 
 export default {
-  components: {RecordList},
+  components: {RekordboxButtons, TitleEditor, RecordList},
   data() {
     return {
       query: "",
@@ -29,8 +36,6 @@ export default {
       return !!this.records.find(record => record.id === recordId)
     },
     async searchDiscogs() {
-      console.log(this.query)
-
       let recordId = this.query.match(/([0-9]+)$/)[0]
       if(this.recordExists(recordId)){
         this.query = ""

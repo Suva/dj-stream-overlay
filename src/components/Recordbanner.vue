@@ -2,8 +2,10 @@
     <div :class="{ right, bottom }">
       <div class="record" :class="{ right, bottom }">
         <img v-if="thumbnail" :src="thumbnail">
+        <img v-if="!thumbnail" src="/no-image.jpg">
         <div class="text">
-          <h2>{{ artist }} - {{ title }}</h2>
+          <h2 class="artist">{{ artist }}</h2>
+          <h2 class="title">{{title}}</h2>
           <div class="additional-info">
             {{ label }} {{ year }} {{ country }}
           </div>
@@ -52,19 +54,30 @@ export default {
   }
 }
 </script>
-
 <style lang="scss" scoped>
 .record {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.36);
-  width: 48vw;
+  width: 38vw;
   border: 1px solid black;
   display: flex;
   height: 100px;
   overflow: hidden;
-  background: linear-gradient(#0c1821, #043453);
   border-radius: 0 0 20px 0;
   position: relative;
   z-index: 3;
+  font-family: 'Abel', sans-serif;
+
+  background: linear-gradient(270deg, #0c1821, #1b5478, #3b1a64, #b8143a, #b87014);
+  background-size: 1000% 1000%;
+
+  animation: pulsating-bg 17s ease infinite;
+
+  @keyframes pulsating-bg {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+
   &.bottom {
     border-radius: 0 20px 0 0;
   }
@@ -81,6 +94,14 @@ export default {
 
   img {
     height: 100%;
+  }
+
+  .artist {
+    font-size: 150%;
+  }
+
+  .title {
+    font-size: 120%;
   }
 
   .text {
@@ -112,7 +133,7 @@ export default {
   &.bottom {
     position: absolute;
     bottom: 105px;
-    width: 48vw;
+    width: 38vw;
   }
 }
 
@@ -127,14 +148,14 @@ export default {
   text-shadow: 0px 0px 5px black;
   img {
     max-height: 75vh;
-    max-width: 50vw;
+    max-width: 30vw;
     box-shadow: 0 0 10px black;
   }
 
   &.bottom {
     position: absolute;
     bottom: 140px;
-    width: 48vw;
+    width: 38vw;
   }
 }
 

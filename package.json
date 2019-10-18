@@ -60,8 +60,14 @@
   ],
   "vue": {
     "devServer": {
-      "proxy": "http://localhost:3000",
-      "transportMode": "ws"
+      "/socket.io": {
+        "target": "http://localhost:3000",
+        "ws": true
+      },
+      "*": {
+        "target": "http://localhost:3000"
+      }
+
     }
   }
 }

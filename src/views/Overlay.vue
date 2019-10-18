@@ -10,17 +10,19 @@
     </div></transition>
     <transition name="offscreen">
       <div v-if="leftBottomVisible" class="record-display left bottom">
-        <recordbanner :thumbnail="leftThumb" v-bind="leftBottomRecord" :bottom="true"></recordbanner>
+        <recordbanner v-bind="leftBottomRecord" :bottom="true"></recordbanner>
       </div></transition>
     <transition name="offscreen-right">
       <div v-if="rightBottomVisible" class="record-display right bottom">
-        <recordbanner :thumbnail="rightThumb" v-bind="rightBottomRecord" :right="true" :bottom="true"></recordbanner>
+        <recordbanner v-bind="rightBottomRecord" :right="true" :bottom="true"></recordbanner>
       </div></transition>
+    <title-screen :title="title" :subtitle="subtitle"></title-screen>
   </div>
 </template>
 
 <script>
 import Recordbanner from "../components/Recordbanner"
+import TitleScreen from "../components/TitleScreen"
 const socket = io();
 
 function cleanName(name) {
@@ -39,16 +41,9 @@ function mapDiscogsRecord(record) {
   }
 }
 
-function mapRekordboxRecord(record) {
-  return {
-    artist: record.artist,
-    title: record.title,
-  }
-}
-
 export default {
   name: "Overlay",
-  components: {Recordbanner},
+  components: {TitleScreen, Recordbanner},
   data () {
     return {
       leftVisible: false,
@@ -59,16 +54,20 @@ export default {
       rightBottomVisible: false,
       leftBottomRecord: null,
       rightBottomRecord: null,
-      leftThumb: null,
-      rightThumb: null
+      title: null,
+      subtitle: null
     }
   },
   created() {
     socket.on('unload', (deck) => {
       if(deck === 0) {
         this.leftVisible = false
-      } else {
+      } else if(deck === 1) {
         this.rightVisible = false
+      } else if(deck === 2) {
+        this.leftBottomVisible = false
+      } else if(deck === 3) {
+        this.rightBottomVisible = false
       }
     })
     socket.on('load', ({channel, record}) => {
@@ -78,40 +77,35 @@ export default {
           this.leftRecord = mapDiscogsRecord(record)
           this.leftVisible = true
         }, 300)
-      } else {
+      } else if(channel === 1) {
         this.rightVisible = false
         setTimeout(() => {
           this.rightRecord = mapDiscogsRecord(record)
           this.rightVisible = true
         }, 300)
-      }
-    })
-    socket.on('rekordbox-load', (record) => {
-      console.log(record)
-      if(record.deck === 2) {
-        this.leftBottomRecord = false
+      } else if(channel === 3) {
+        this.leftBottomVisible = false
         setTimeout(() => {
-          this.leftBottomRecord = mapRekordboxRecord(record)
+          this.leftBottomRecord = record
           this.leftBottomVisible = true
         }, 300)
       } else {
         this.rightBottomVisible = false
         setTimeout(() => {
-          this.rightBottomRecord = mapRekordboxRecord(record)
+          this.rightBottomRecord = record
           this.rightBottomVisible = true
         }, 300)
       }
     })
-    socket.on('rekordbox-image', (image) => {
-      if(image.deck === 2) {
-        setTimeout(() => {
-          this.leftThumb = 'data:image/jpeg;base64,' + image.data
-        }, 300)
-      } else {
-        setTimeout(() => {
-          this.rightThumb = 'data:image/jpeg;base64,' + image.data
-        }, 300)
-      }
+
+    socket.on('title', (data) => {
+      console.log(data)
+      this.title = data.title
+      this.subtitle = data.subtitle
+      setTimeout(() => {
+        this.title = null
+        this.subtitle = null
+      }, 20000)
     })
   }
 }

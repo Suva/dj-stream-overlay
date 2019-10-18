@@ -24,8 +24,12 @@
 </template>
 <script>
 import draggable from 'vuedraggable'
-const socket = io()
+const socket = window.socket;
+
 const isInViewport = function (elem) {
+  if(!elem){
+    return true;
+  }
   const bounding = elem.getBoundingClientRect();
   return (
     bounding.top >= 0 &&
@@ -63,6 +67,9 @@ export default {
       this.$emit('remove', id)
     },
     load(record) {
+      if(!record || !record.record.id) {
+        return
+      }
       socket.emit('load', record)
     },
     unload(deck) {
