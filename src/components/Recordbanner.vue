@@ -1,6 +1,6 @@
 <template>
     <div :class="{ right, bottom }">
-      <div class="record" :class="{ right, bottom }">
+      <div class="record" :class="{ right, bottom }" :style="recordStyle">
         <img v-if="thumbnail" :src="thumbnail">
         <img v-if="!thumbnail" src="/no-image.jpg">
         <div class="text">
@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import * as Vibrant from 'node-vibrant'
+
 export default {
   name: "Recordbanner",
   props: [
@@ -41,12 +43,21 @@ export default {
   data() {
     return {
       coming: false,
+      lightVibrant: '#f4a209',
+      darkVibrant: '#871b89',
+      lightMuted: '#351c87',
+      darkMuted: '#351c87',
+      recordStyle: ''
     }
   },
   watch: {
   },
-  mounted(){
+  async mounted(){
     this.coming = true
+    if(this.thumbnail){
+      const palette = await Vibrant.from(this.thumbnail).getPalette()
+      this.recordStyle = `background-image: linear-gradient(249deg, ${palette.DarkMuted.hex}, ${palette.DarkVibrant.hex}, ${palette.LightMuted.hex}, ${palette.LightVibrant.hex})`
+    }
     setTimeout(() => { this.coming = false }, 10000)
   },
   methods: {
@@ -56,7 +67,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .record {
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.36);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.56) ;
   width: 38vw;
   border: 1px solid black;
   display: flex;
@@ -67,15 +78,14 @@ export default {
   z-index: 3;
   font-family: 'Abel', sans-serif;
 
-  background: linear-gradient(270deg, #0c1821, #1b5478, #3b1a64, #b8143a, #b87014);
-  background-size: 1000% 1000%;
+  background: linear-gradient(249deg, #120a24, #351c87, #871b89, #f4a209);
+  background-size: 800% 800%;
 
-  animation: pulsating-bg 17s ease infinite;
+  animation: fading-bg 10s ease-out forwards;
 
-  @keyframes pulsating-bg {
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
+  @keyframes fading-bg {
+    0%{background-position:0% 0%}
+    100%{background-position:100% 100%}
   }
 
   &.bottom {
@@ -112,6 +122,7 @@ export default {
     justify-content: center;
     flex-direction: column;
     text-align: left;
+    text-shadow: 1px 1px 5px black;
     h2 {
       margin: 0;
     }

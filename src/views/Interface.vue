@@ -71,13 +71,17 @@ export default {
 }
 </script>
 
-<style lang="scss">
-  .buttons {
-    button {
-      margin: 10px;
-      font-size: 20px;
-      padding: 10px;
+<style lang="scss" scoped>
+  .interface {
+    padding: 0 80px;
+    .buttons {
+      button {
+        margin: 10px;
+        font-size: 20px;
+        padding: 10px;
+      }
     }
   }
+
 </style>
 

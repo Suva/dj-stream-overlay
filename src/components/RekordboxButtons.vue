@@ -20,10 +20,14 @@ export default {
   created() {
     socket.on('rekordbox-load', (track) => {
       this.decks = this.decks.map((deck, idx) => {
-        if(deck && deck.image && (Number(new Date()) - deck.imageTime > 2000)) {
-          delete deck.image
+        if(idx + 1 === track.deck){
+          if(deck && deck.image && (Number(new Date()) - deck.imageTime > 2000)) {
+            delete deck.image
+          }
+          return { ...deck, ...track}
         }
-        return idx + 1 === track.deck ? { ...deck, ...track} : deck
+
+        return deck
       })
     })
     socket.on('rekordbox-image', (image) => {
@@ -41,6 +45,7 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    margin-bottom: 20px;
   }
 </style>
 

@@ -6,10 +6,16 @@ const io = require('socket.io')(http);
 const {resolve} = require("path")
 
 const Discogs = require('disconnect').Client;
+const axios = require('axios')
 
 io.on('connection', function(socket){
-  socket.on('load', function(msg){
-    console.log('load', msg)
+  socket.on('load', async function(msg){
+    console.log("load")
+    if(msg.record.thumb) {
+      const image = await axios.get(msg.record.thumb, {responseType: 'arraybuffer'})
+      msg.record.thumbnail = 'data:image/jpeg;base64,' + image.data.toString('base64')
+    }
+
     io.emit('load', msg);
   });
   socket.on('unload', function(msg){

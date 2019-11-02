@@ -58,7 +58,7 @@
           }
         })
       },
-      unload(deck) {
+      unload() {
         socket.emit('unload',  this.track.deck < 3 ? 2 : 3)
       }
     },

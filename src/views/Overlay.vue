@@ -36,8 +36,8 @@ function mapDiscogsRecord(record) {
     year: record.year,
     country: record.country,
     label: record.labels.map(label => cleanName(label.name)).join(", "),
-    thumbnail: record.thumb,
-    image: record.images[0].uri
+    image: record.images[0].uri,
+    thumbnail: record.thumbnail
   }
 }
 
